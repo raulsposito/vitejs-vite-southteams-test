@@ -41,6 +41,7 @@ p {
 .name-container {
   display: flex;
   text-align: center;
+  margin-top: -2rem;
   justify-content: center;
   flex-direction: row;
   color: #fff;
@@ -82,4 +83,14 @@ p {
   background-color: #fff;
   border-radius: 5px;
   border: 2px solid #000;
+}
+
+.icon {
+  position: relative;
+  height: 1.25rem /* 20px */;
+  width: 1.25rem /* 20px */;
+  color: #fff;
+  display: flex;
+  padding-left: 0.5rem;
+  padding-top: 0.5rem;
 }
