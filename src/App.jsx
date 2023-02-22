@@ -47,6 +47,7 @@ function App() {
         }
       })
     );
+    // it needs to re render if any of the below change
   }, [filteredUsers, sortOrder, sortField]);
 
   useEffect(() => {
