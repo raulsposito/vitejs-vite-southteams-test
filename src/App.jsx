@@ -10,49 +10,35 @@ function App() {
   const [sortField, setSortField] = useState('name.first');
   const [selectedUser, setSelectedUser] = useState(null);
 
-  const [filteredUsers, setFilteredUsers] = useState(users);
-  const [sortedUsers, setSortedUsers] = useState(filteredUsers);
-  const [displayedUsers, setDisplayedUsers] = useState(sortedUsers);
+  // filter users based on search term
+  const filteredUsers = users.filter(
+    (user) =>
+      user.name.first.toLowerCase().includes(search.toLowerCase()) ||
+      user.name.last.toLowerCase().includes(search.toLowerCase()) ||
+      user.email.toLowerCase().includes(search.toLowerCase()) ||
+      user.location.city.toLowerCase().includes(search.toLowerCase()) ||
+      user.location.country.toLowerCase().includes(search.toLowerCase())
+  );
 
-  useEffect(() => {
-    setFilteredUsers(
-      users.filter(
-        (user) =>
-          user.name.first.toLowerCase().includes(search.toLowerCase()) ||
-          user.name.last.toLowerCase().includes(search.toLowerCase()) ||
-          user.email.toLowerCase().includes(search.toLowerCase()) ||
-          user.location.city.toLowerCase().includes(search.toLowerCase()) ||
-          user.location.country.toLowerCase().includes(search.toLowerCase())
-      )
-    );
-  }, [search, users]);
+  // sort filtered users based on sort order and field
+  const sortedUsers = filteredUsers.slice().sort((a, b) => {
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+    if (aValue < bValue) {
+      return sortOrder === 'asc' ? -1 : 1;
+    } else if (aValue > bValue) {
+      return sortOrder === 'asc' ? 1 : -1;
+    } else {
+      if (sortField === 'name.first' || sortField === 'name.last') {
+        return sortOrder === 'asc' ? -1 : 1;
+      } else {
+        return 0;
+      }
+    }
+  });
 
-  useEffect(() => {
-    setSortedUsers(
-      filteredUsers.slice().sort((a, b) => {
-        const aValue = a[sortField];
-        const bValue = b[sortField];
-        if (aValue < bValue) {
-          return sortOrder === 'asc' ? -1 : 1;
-        } else if (aValue > bValue) {
-          return sortOrder === 'asc' ? 1 : -1;
-        } else {
-          // if sortField is 'name.first' or 'name.last',
-          // set the sorting order based on sortOrder
-          if (sortField === 'name.first' || sortField === 'name.last') {
-            return sortOrder === 'asc' ? -1 : 1;
-          } else {
-            return 0;
-          }
-        }
-      })
-    );
-    // it needs to re render if any of the below change
-  }, [filteredUsers, sortOrder, sortField]);
-
-  useEffect(() => {
-    setDisplayedUsers(sortedUsers);
-  }, [sortedUsers]);
+  // update displayed users whenever filtered or sorted users change
+  const displayedUsers = sortedUsers.slice();
 
   useEffect(() => {
     fetch('https://randomuser.me/api/?results=10')
@@ -61,36 +47,15 @@ function App() {
   }, []);
 
   const handleSortClick = (field) => {
-    console.log(field, 'field');
-    console.log(sortOrder, 'Order');
     if (sortField === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
       setSortField(field);
       setSortOrder('asc');
     }
-    setSortedUsers(
-      filteredUsers.slice().sort((a, b) => {
-        // check whether the selected field is a nested object property or not
-        const aValue = field.includes('.')
-          ? a[field.split('.')[0]][field.split('.')[1]]
-          : a[field];
-        const bValue = field.includes('.')
-          ? b[field.split('.')[0]][field.split('.')[1]]
-          : b[field];
-        if (aValue < bValue) {
-          return sortOrder === 'asc' ? -1 : 1;
-        } else if (aValue > bValue) {
-          return sortOrder === 'asc' ? 1 : -1;
-        } else {
-          return 0;
-        }
-      })
-    );
   };
 
   const handleEditClick = (user) => {
-    console.log(user, 'User');
     setSelectedUser(user);
   };
 
@@ -106,38 +71,10 @@ function App() {
       },
       email: form.elements['email'].value,
     };
-    const updatedUsers = filteredUsers.map((user) =>
+    const updatedUsers = users.map((user) =>
       user.email === selectedUser.email ? updatedUser : user
     );
     setUsers(updatedUsers);
-
-    const updatedFilteredUsers = updatedUsers.filter(
-      (user) =>
-        user.name.first.toLowerCase().includes(search.toLowerCase()) ||
-        user.name.last.toLowerCase().includes(search.toLowerCase()) ||
-        user.email.toLowerCase().includes(search.toLowerCase()) ||
-        user.location.city.toLowerCase().includes(search.toLowerCase()) ||
-        user.location.country.toLowerCase().includes(search.toLowerCase())
-    );
-    setFilteredUsers(updatedFilteredUsers);
-
-    const updatedSortedUsers = updatedFilteredUsers.slice().sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
-      if (aValue < bValue) {
-        return sortOrder === 'asc' ? -1 : 1;
-      } else if (aValue > bValue) {
-        return sortOrder === 'asc' ? 1 : -1;
-      } else {
-        if (sortField === 'name.first' || sortField === 'name.last') {
-          return sortOrder === 'asc' ? -1 : 1;
-        } else {
-          return 0;
-        }
-      }
-    });
-    setSortedUsers(updatedSortedUsers);
-
     setSelectedUser(null);
   };
 
@@ -156,7 +93,7 @@ function App() {
       <div>
         <div role="group">
           <button type="button" onClick={() => handleSortClick('name.first')}>
-            Name{' '}
+            Name
           </button>
           <button type="button" onClick={() => handleSortClick('name.last')}>
             Last Name{' '}
