@@ -154,8 +154,10 @@ function App() {
               }
             />
           </label>
-          <button type="submit">Save</button>
-          <button onClick={() => setSelectedUser(null)}>Cancel</button>
+          <div className="form-buttons-container">
+            <button type="submit">Save</button>
+            <button onClick={() => setSelectedUser(null)}>Cancel</button>
+          </div>
         </form>
       ) : (
         <ul role="list" className="users-grid">

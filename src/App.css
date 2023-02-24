@@ -99,3 +99,17 @@ p {
   padding-left: 0.5rem;
   padding-top: 0.5rem;
 }
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+label {
+  padding: 3px;
+}
+
+.form-buttons-container {
+  padding-top: 8px;
+}
